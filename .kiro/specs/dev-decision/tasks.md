@@ -71,14 +71,14 @@ This implementation plan breaks down the DevDecision tech stack comparison tool 
 - [x] 4. Checkpoint - Core backend modules complete
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 5. Implement Insight Module with Gemini Integration
-  - [ ] 5.1 Set up Google Gemini 1.5 Flash integration
+- [x] 5. Implement Insight Module with Gemini Integration
+  - [x] 5.1 Set up Google Gemini 1.5 Flash integration
     - Configure VertexAI client and authentication
     - Create GeminiService with prompt engineering
     - Implement JSON response parsing
     - _Requirements: 4.1, 4.2_
 
-  - [ ] 5.2 Implement fallback mechanism for AI failures
+  - [x] 5.2 Implement fallback mechanism for AI failures
     - Create InsightFallbackService with mock data
     - Add retry logic with @Retryable annotation
     - Ensure graceful degradation when API fails
@@ -88,7 +88,7 @@ This implementation plan breaks down the DevDecision tech stack comparison tool 
     - **Property 12: AI Analysis Generation**
     - **Validates: Requirements 4.1**
 
-  - [ ] 5.4 Implement trade-off analysis and recommendations
+  - [x] 5.4 Implement trade-off analysis and recommendations
     - Generate personalized recommendations based on constraints
     - Identify key trade-offs between technologies
     - Create decision support questions
