@@ -49,7 +49,7 @@ public class Technology {
      * satisfaction_score, performance_score, learning_curve_score, community_score
      */
     @JdbcTypeCode(SqlTypes.JSON)
-    @Column(name = "metrics", columnDefinition = "jsonb")
+    @Column(name = "metrics")
     private Map<String, Double> metrics = new HashMap<>();
 
     /**
