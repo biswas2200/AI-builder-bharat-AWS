@@ -41,6 +41,10 @@ logging:
   level:
     com.devdecision: INFO
     org.springframework.modulith: DEBUG
+    # Request/Response logging
+    org.springframework.web.filter.CommonsRequestLoggingFilter: DEBUG
+    # Performance monitoring
+    org.springframework.cache: DEBUG
 
 # Google Cloud Vertex AI Configuration
 google:
@@ -57,3 +61,5 @@ devdecision:
   cache:
     technology-ttl: 3600 # 1 hour
     comparison-ttl: 1800 # 30 minutes
+  performance:
+    max-comparison-time-ms: 500 # Requirement 8.4: 500ms response time

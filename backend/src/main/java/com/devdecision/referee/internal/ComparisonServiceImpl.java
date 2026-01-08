@@ -44,6 +44,12 @@ public class ComparisonServiceImpl implements ComparisonService {
             throw new IllegalArgumentException("Cannot compare more than 5 technologies at once");
         }
         
+        // Validate technologies exist using optimized batch query
+        List<Technology> technologies = inventoryService.findTechnologiesByIds(technologyIds);
+        if (technologies.size() != technologyIds.size()) {
+            throw new IllegalArgumentException("Some technology IDs not found");
+        }
+        
         // Calculate scores
         List<TechnologyScore> scores = scoringService.calculateScores(technologyIds, constraints);
         

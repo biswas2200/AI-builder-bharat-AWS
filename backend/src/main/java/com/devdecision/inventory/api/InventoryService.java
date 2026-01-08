@@ -45,6 +45,13 @@ public interface InventoryService {
     Optional<Technology> findTechnologyByName(String name);
 
     /**
+     * Find technologies by IDs (optimized for batch operations)
+     * @param ids list of technology IDs
+     * @return list of technologies with the specified IDs
+     */
+    List<Technology> findTechnologiesByIds(List<Long> ids);
+
+    /**
      * Get all technologies
      * @return list of all technologies
      */

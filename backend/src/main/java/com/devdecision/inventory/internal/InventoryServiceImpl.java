@@ -88,6 +88,19 @@ public class InventoryServiceImpl implements InventoryService {
     }
 
     @Override
+    @Cacheable(value = "technologies", key = "'ids:' + #ids.toString()")
+    public List<Technology> findTechnologiesByIds(List<Long> ids) {
+        logger.debug("Finding technologies by IDs: {}", ids);
+        
+        if (ids == null || ids.isEmpty()) {
+            return List.of();
+        }
+        
+        // Use optimized batch query for comparison operations
+        return technologyRepository.findByIdsWithTags(ids);
+    }
+
+    @Override
     @Cacheable(value = "technologies", key = "'all'")
     public List<Technology> getAllTechnologies() {
         logger.debug("Getting all technologies");
