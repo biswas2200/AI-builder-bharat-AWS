@@ -8,6 +8,7 @@ import com.devdecision.referee.api.WeightedScoringService;
 import com.devdecision.referee.domain.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.Cacheable;
 import java.text.DecimalFormat;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -31,6 +32,7 @@ public class ComparisonServiceImpl implements ComparisonService {
     }
 
     @Override
+    @Cacheable(value = "comparisons", key = "#technologyIds.toString() + ':' + #constraints.hashCode()")
     public ComparisonResult generateComparison(List<Long> technologyIds, UserConstraints constraints) {
         log.info("Generating comparison for {} technologies", technologyIds.size());
         
@@ -70,6 +72,7 @@ public class ComparisonServiceImpl implements ComparisonService {
     }
 
     @Override
+    @Cacheable(value = "comparisons", key = "#technologyNames.toString() + ':' + #constraints.hashCode()")
     public ComparisonResult generateComparisonByNames(List<String> technologyNames, UserConstraints constraints) {
         log.info("Generating comparison for technologies by names: {}", technologyNames);
         

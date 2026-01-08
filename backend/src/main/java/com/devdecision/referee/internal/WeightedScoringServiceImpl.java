@@ -8,6 +8,7 @@ import com.devdecision.referee.domain.TechnologyScore;
 import com.devdecision.referee.domain.UserConstraints;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.Cacheable;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -29,6 +30,7 @@ public class WeightedScoringServiceImpl implements WeightedScoringService {
     }
 
     @Override
+    @Cacheable(value = "comparisons", key = "'scores:' + #technologyIds.toString() + ':' + #constraints.hashCode()")
     public List<TechnologyScore> calculateScores(List<Long> technologyIds, UserConstraints constraints) {
         log.debug("Calculating scores for {} technologies with constraints: {}", 
                  technologyIds.size(), constraints);
@@ -57,6 +59,7 @@ public class WeightedScoringServiceImpl implements WeightedScoringService {
     }
 
     @Override
+    @Cacheable(value = "comparisons", key = "'scores-names:' + #technologyNames.toString() + ':' + #constraints.hashCode()")
     public List<TechnologyScore> calculateScoresByNames(List<String> technologyNames, UserConstraints constraints) {
         log.debug("Calculating scores for technologies by names: {}", technologyNames);
         
