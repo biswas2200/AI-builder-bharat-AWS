@@ -37,4 +37,55 @@
   .aurora-bg {
     background: radial-gradient(ellipse at center, rgba(168, 85, 247, 0.15) 0%, transparent 70%);
   }
+
+  /* Enhanced Neon & Void Styles */
+  .neon-border {
+    @apply border border-purple-500/50 dark:border-purple-400/60;
+    box-shadow: 0 0 10px rgba(168, 85, 247, 0.3);
+  }
+  
+  .void-card {
+    @apply bg-slate-900/50 dark:bg-slate-950/80 backdrop-blur-md;
+    @apply border border-purple-500/20 dark:border-purple-400/30;
+  }
+  
+  .neon-text {
+    @apply text-purple-600 dark:text-purple-400;
+    text-shadow: 0 0 10px rgba(168, 85, 247, 0.5);
+  }
+  
+  .aurora-glow {
+    position: relative;
+  }
+  
+  .aurora-glow::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(168, 85, 247, 0.1) 0%, transparent 70%);
+    transform: translate(-50%, -50%);
+    animation: aurora 8s ease-in-out infinite;
+    pointer-events: none;
+    z-index: -1;
+  }
+  
+  .mesh-gradient {
+    background: linear-gradient(135deg, #faf5ff 0%, #ffffff 50%, #f3e8ff 100%);
+  }
+  
+  .void-gradient {
+    background: linear-gradient(135deg, #020617 0%, #0f172a 50%, #1e293b 100%);
+  }
+  
+  .glow-on-hover {
+    @apply transition-all duration-300;
+  }
+  
+  .glow-on-hover:hover {
+    @apply shadow-neon;
+    transform: translateY(-2px);
+  }
 }

@@ -16,7 +16,7 @@ export default function Layout({ children }: LayoutProps) {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
-              <h1 className="text-2xl font-bold text-purple-900 dark:text-purple-400">
+              <h1 className="text-2xl font-bold neon-text">
                 DevDecision
               </h1>
             </div>
@@ -24,7 +24,7 @@ export default function Layout({ children }: LayoutProps) {
             {/* Theme Toggle */}
             <button
               onClick={toggleTheme}
-              className="p-2 rounded-lg bg-white/50 dark:bg-white/10 hover:bg-white/70 dark:hover:bg-white/20 transition-all duration-200 neon-glow"
+              className="p-3 rounded-xl glassmorphism neon-border glow-on-hover transition-all duration-300"
               aria-label="Toggle theme"
             >
               {theme === 'light' ? (
