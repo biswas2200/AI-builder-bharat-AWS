@@ -1,0 +1,40 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+  
+  body {
+    @apply transition-colors duration-300;
+  }
+}
+
+@layer components {
+  .comparison-card {
+    @apply transition-all duration-300 hover:-translate-y-1;
+    box-shadow: 0 10px 25px rgba(168, 85, 247, 0.15);
+  }
+  
+  .comparison-card:hover {
+    box-shadow: 0 20px 40px rgba(168, 85, 247, 0.25);
+  }
+  
+  .search-input:focus {
+    @apply ring-2 ring-purple-500 ring-opacity-50;
+  }
+  
+  .glassmorphism {
+    @apply backdrop-blur-md bg-white/70 dark:bg-white/10;
+  }
+  
+  .neon-glow {
+    @apply shadow-lg shadow-purple-500/25;
+  }
+  
+  .aurora-bg {
+    background: radial-gradient(ellipse at center, rgba(168, 85, 247, 0.15) 0%, transparent 70%);
+  }
+}

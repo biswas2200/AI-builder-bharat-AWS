@@ -1,0 +1,59 @@
+spring:
+  application:
+    name: devdecision-backend
+  
+  datasource:
+    url: jdbc:postgresql://localhost:5432/devdecision
+    username: ${DB_USERNAME:devdecision}
+    password: ${DB_PASSWORD:devdecision}
+    driver-class-name: org.postgresql.Driver
+  
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+  
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+      timeout: 2000ms
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
+  
+  cache:
+    type: redis
+    redis:
+      time-to-live: 600000 # 10 minutes
+
+server:
+  port: 8080
+
+logging:
+  level:
+    com.devdecision: INFO
+    org.springframework.modulith: DEBUG
+
+# Google Cloud Vertex AI Configuration
+google:
+  cloud:
+    project-id: ${GOOGLE_CLOUD_PROJECT_ID:}
+    location: ${GOOGLE_CLOUD_LOCATION:us-central1}
+
+# Custom application properties
+devdecision:
+  gemini:
+    model-name: gemini-1.5-flash
+    max-retries: 3
+    timeout: 30s
+  cache:
+    technology-ttl: 3600 # 1 hour
+    comparison-ttl: 1800 # 30 minutes

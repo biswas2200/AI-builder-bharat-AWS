@@ -1,0 +1,24 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: 
+  
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+  
+  data:
+    redis:
+      host: localhost
+      port: 6370 # Different port for test Redis
+  
+  cache:
+    type: simple # Use simple cache for tests
+
+logging:
+  level:
+    com.devdecision: DEBUG
+    org.springframework.modulith: DEBUG
