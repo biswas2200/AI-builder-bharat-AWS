@@ -5,7 +5,7 @@ import {
   ComparisonResult,
   ApiError,
 } from '../types/api';
-import { comparisonService, inventoryService } from '../services';
+import { comparisonService } from '../services';
 
 // State interface
 interface ComparisonState {

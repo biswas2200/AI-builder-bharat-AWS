@@ -21,7 +21,8 @@ This implementation plan breaks down the DevDecision tech stack comparison tool 
     - Set up database schema and migrations
     - _Requirements: 1.1, 2.3_
 
-  - [ ]* 2.2 Write property test for Technology data persistence
+  - [x] 2.2 Write property test for Technology data persistence
+
     - **Property 1: Technology Data Round Trip**
     - **Validates: Requirements 1.1, 8.1**
 
@@ -31,11 +32,13 @@ This implementation plan breaks down the DevDecision tech stack comparison tool 
     - Add custom technology creation endpoint
     - _Requirements: 1.2, 1.4, 1.5_
 
-  - [ ]* 2.4 Write property test for search result relevance
+  - [x] 2.4 Write property test for search result relevance
+
     - **Property 2: Search Result Relevance**
     - **Validates: Requirements 1.2**
 
-  - [ ]* 2.5 Write property test for technology display completeness
+  - [x] 2.5 Write property test for technology display completeness
+
     - **Property 3: Technology Display Completeness**
     - **Validates: Requirements 1.4**
 
@@ -46,11 +49,13 @@ This implementation plan breaks down the DevDecision tech stack comparison tool 
     - Implement score normalization to 0-100 scale
     - _Requirements: 2.1, 2.2, 2.4_
 
-  - [ ]* 3.2 Write property test for weighted scoring consistency
+  - [x] 3.2 Write property test for weighted scoring consistency
+
     - **Property 5: Weighted Scoring Consistency**
     - **Validates: Requirements 2.1**
 
-  - [ ]* 3.3 Write property test for tag multiplier application
+  - [ ] 3.3 Write property test for tag multiplier application
+
     - **Property 6: Tag Multiplier Application**
     - **Validates: Requirements 2.2**
 

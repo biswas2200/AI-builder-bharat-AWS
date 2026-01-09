@@ -15,11 +15,16 @@ spring:
   
   data:
     redis:
-      host: localhost
-      port: 6370 # Different port for test Redis
+      repositories:
+        enabled: false
   
   cache:
     type: simple # Use simple cache for tests
+  
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration
+      - org.springframework.boot.autoconfigure.data.redis.RedisRepositoriesAutoConfiguration
 
 logging:
   level:

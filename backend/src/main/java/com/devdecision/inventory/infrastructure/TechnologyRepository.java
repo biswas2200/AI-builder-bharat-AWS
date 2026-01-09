@@ -86,6 +86,24 @@ public interface TechnologyRepository extends JpaRepository<Technology, Long> {
     List<Technology> searchTechnologies(@Param("query") String query);
 
     /**
+     * Simplified search query for testing with H2 database
+     * Removes complex ORDER BY to avoid H2 DISTINCT compatibility issues
+     */
+    @Query("""
+        SELECT DISTINCT t FROM Technology t 
+        LEFT JOIN t.tags tag 
+        WHERE LOWER(t.name) LIKE LOWER(CONCAT('%', :query, '%')) 
+           OR LOWER(t.category) LIKE LOWER(CONCAT('%', :query, '%'))
+           OR LOWER(tag) LIKE LOWER(CONCAT('%', :query, '%'))
+        ORDER BY t.name
+        """)
+    @QueryHints({
+        @QueryHint(name = "org.hibernate.cacheable", value = "true"),
+        @QueryHint(name = "org.hibernate.fetchSize", value = "20")
+    })
+    List<Technology> searchTechnologiesSimple(@Param("query") String query);
+
+    /**
      * Find technologies that have a specific tag (case-insensitive)
      * Optimized for tag-based filtering
      */
