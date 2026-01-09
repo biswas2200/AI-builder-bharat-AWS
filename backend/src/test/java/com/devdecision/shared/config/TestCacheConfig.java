@@ -29,7 +29,11 @@ public class TestCacheConfig {
             "criteria",
             "comparisons",
             "categories",
-            "tags"
+            "tags",
+            "insights",
+            "personalizedInsights",
+            "tradeOffAnalysis",
+            "decisionQuestions"
         );
     }
 }

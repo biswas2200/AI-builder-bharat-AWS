@@ -54,12 +54,13 @@ This implementation plan breaks down the DevDecision tech stack comparison tool 
     - **Property 5: Weighted Scoring Consistency**
     - **Validates: Requirements 2.1**
 
-  - [ ] 3.3 Write property test for tag multiplier application
+  - [x] 3.3 Write property test for tag multiplier application
 
     - **Property 6: Tag Multiplier Application**
     - **Validates: Requirements 2.2**
 
-  - [ ]* 3.4 Write property test for score normalization range
+  - [x] 3.4 Write property test for score normalization range
+
     - **Property 7: Score Normalization Range**
     - **Validates: Requirements 2.4**
 
@@ -69,7 +70,8 @@ This implementation plan breaks down the DevDecision tech stack comparison tool 
     - Calculate KPI metrics for technologies
     - _Requirements: 3.2, 3.3_
 
-  - [ ]* 3.6 Write property test for radar chart data structure
+  - [x] 3.6 Write property test for radar chart data structure
+
     - **Property 9: Radar Chart Data Structure**
     - **Validates: Requirements 3.2**
 
@@ -89,7 +91,8 @@ This implementation plan breaks down the DevDecision tech stack comparison tool 
     - Ensure graceful degradation when API fails
     - _Requirements: 4.1_
 
-  - [ ]* 5.3 Write property test for AI analysis generation
+  - [x] 5.3 Write property test for AI analysis generation
+
     - **Property 12: AI Analysis Generation**
     - **Validates: Requirements 4.1**
 
@@ -99,7 +102,8 @@ This implementation plan breaks down the DevDecision tech stack comparison tool 
     - Create decision support questions
     - _Requirements: 4.2, 4.3, 4.4, 4.5_
 
-  - [ ]* 5.5 Write property test for personalized recommendations
+  - [x] 5.5 Write property test for personalized recommendations
+
     - **Property 13: Personalized Recommendations**
     - **Validates: Requirements 4.2**
 

@@ -134,6 +134,52 @@ public class RecommendationEngine {
     }
     
     /**
+     * Generate analysis for a single technology
+     */
+    public String generateSingleTechnologyAnalysis(String technologyName) {
+        StringBuilder analysis = new StringBuilder();
+        analysis.append("**Technology Analysis for ").append(technologyName).append(":**\n\n");
+        
+        TechnologyProfile profile = technologyProfiles.get(technologyName.toLowerCase());
+        
+        if (profile != null) {
+            analysis.append("**Key Considerations:**\n");
+            analysis.append("• **Performance**: ").append(profile.getPerformanceVsSpeedAnalysis()).append("\n");
+            analysis.append("• **Learning Curve**: ").append(profile.getLearningCurveAnalysis()).append("\n");
+            analysis.append("• **Community & Innovation**: ").append(profile.getCommunityVsInnovationAnalysis()).append("\n\n");
+            
+            analysis.append("**Decision Factors:**\n");
+            analysis.append("• Evaluate if this technology aligns with your team's current expertise\n");
+            analysis.append("• Consider the long-term maintenance and support requirements\n");
+            analysis.append("• Assess how well it fits your project's specific requirements\n");
+            analysis.append("• Review the ecosystem and available tooling\n\n");
+            
+            analysis.append("**Recommendation**: ");
+            analysis.append(technologyName).append(" can be a solid choice for your project. ");
+            analysis.append("Consider your team's expertise, project requirements, and long-term goals when making the final decision.");
+        } else {
+            // Fallback for unknown technologies
+            analysis.append("**Key Considerations:**\n");
+            analysis.append("• **Performance**: Evaluate runtime performance benchmarks for your specific use case\n");
+            analysis.append("• **Learning Curve**: Assess the time investment needed for team training and productivity\n");
+            analysis.append("• **Community**: Research community size, activity, and long-term support prospects\n\n");
+            
+            analysis.append("**Decision Factors:**\n");
+            analysis.append("• Research the technology's maturity and stability\n");
+            analysis.append("• Evaluate available documentation and learning resources\n");
+            analysis.append("• Consider the ecosystem and third-party integrations\n");
+            analysis.append("• Assess the technology's roadmap and future prospects\n\n");
+            
+            analysis.append("**Recommendation**: ");
+            analysis.append("Conduct thorough research on ").append(technologyName);
+            analysis.append(" to ensure it meets your project requirements and team capabilities. ");
+            analysis.append("Consider running a small proof-of-concept to validate the technology choice.");
+        }
+        
+        return analysis.toString();
+    }
+    
+    /**
      * Generate contextual questions based on technologies and constraints
      */
     public List<String> generateContextualQuestions(List<String> technologyNames, UserConstraints constraints) {

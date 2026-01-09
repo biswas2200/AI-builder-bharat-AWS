@@ -105,21 +105,21 @@ public class WeightedScoringServiceImpl implements WeightedScoringService {
             Double rawScore = technology.getMetric(criterionKey);
             
             if (rawScore != null) {
-                // Apply tag multiplier if user has prioritized this criterion type
-                double adjustedScore = applyTagMultipliers(rawScore, constraints, criterion.getType().name());
+                // Normalize score to 0-100 scale first
+                double normalizedScore = normalizeScore(rawScore);
                 
-                // Normalize score to 0-100 scale
-                double normalizedScore = normalizeScore(adjustedScore);
+                // Apply tag multiplier after normalization
+                double adjustedScore = applyTagMultipliers(normalizedScore, constraints, criterion.getType().name());
                 
                 // Apply criterion weight
-                double weightedScore = normalizedScore * criterion.getWeight();
+                double weightedScore = adjustedScore * criterion.getWeight();
                 
-                criterionScores.put(criterion.getName(), normalizedScore);
+                criterionScores.put(criterion.getName(), adjustedScore);
                 totalWeightedScore += weightedScore;
                 totalWeight += criterion.getWeight();
                 
-                log.debug("Criterion {}: raw={}, adjusted={}, normalized={}, weighted={}", 
-                         criterion.getName(), rawScore, adjustedScore, normalizedScore, weightedScore);
+                log.debug("Criterion {}: raw={}, normalized={}, adjusted={}, weighted={}", 
+                         criterion.getName(), rawScore, normalizedScore, adjustedScore, weightedScore);
             }
         }
         

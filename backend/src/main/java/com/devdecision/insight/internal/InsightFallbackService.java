@@ -1,9 +1,11 @@
 package com.devdecision.insight.internal;
 
 import com.devdecision.insight.domain.InsightAnalysis;
+import com.devdecision.inventory.domain.Technology;
 import com.devdecision.referee.domain.ComparisonResult;
 import com.devdecision.referee.domain.KpiMetric;
 import com.devdecision.referee.domain.RadarChartData;
+import com.devdecision.referee.domain.TechnologyScore;
 import com.devdecision.referee.domain.UserConstraints;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,15 +34,16 @@ public class InsightFallbackService {
     public ComparisonResult getFallbackData(List<String> technologies) {
         log.info("Generating fallback data for technologies: {}", technologies);
         
+        List<TechnologyScore> scores = generateMockTechnologyScores(technologies);
         List<RadarChartData> radarData = generateMockRadarData(technologies);
         Map<String, List<KpiMetric>> kpiMetrics = generateMockKpiMetrics(technologies);
         String recommendation = generateMockRecommendation(technologies);
         
         return ComparisonResult.builder()
+            .scores(scores)
             .radarData(radarData)
             .kpiMetrics(kpiMetrics)
             .recommendationSummary(recommendation)
-            .scores(new ArrayList<>()) // Will be populated by scoring service
             .build();
     }
     
@@ -57,8 +60,8 @@ public class InsightFallbackService {
      * Get fallback trade-off analysis
      */
     public String getFallbackTradeOffAnalysis(List<String> technologies) {
-        if (technologies.size() < 2) {
-            return "Trade-off analysis requires at least two technologies for comparison.";
+        if (technologies.size() == 1) {
+            return getFallbackSingleTechnologyAnalysis(technologies.get(0));
         }
         
         StringBuilder analysis = new StringBuilder();
@@ -83,6 +86,33 @@ public class InsightFallbackService {
     }
     
     /**
+     * Get fallback analysis for a single technology
+     */
+    private String getFallbackSingleTechnologyAnalysis(String technology) {
+        StringBuilder analysis = new StringBuilder();
+        analysis.append("Technology Analysis for ").append(technology).append(":\n\n");
+        
+        analysis.append("Key Considerations:\n");
+        analysis.append("• Performance: Evaluate how well this technology meets your performance requirements\n");
+        analysis.append("• Learning Curve: Consider your team's current expertise and time available for learning\n");
+        analysis.append("• Community Support: Research the size and activity of the community\n");
+        analysis.append("• Documentation: Assess the quality and completeness of available documentation\n");
+        analysis.append("• Ecosystem: Review available tools, libraries, and integrations\n\n");
+        
+        analysis.append("Decision Factors:\n");
+        analysis.append("• Does this technology align with your project requirements?\n");
+        analysis.append("• Can your team effectively use and maintain it?\n");
+        analysis.append("• Is there adequate long-term support and community?\n");
+        analysis.append("• How does it integrate with your existing technology stack?\n\n");
+        
+        analysis.append("Recommendation: ").append(technology).append(" can be a good choice if it aligns with your ");
+        analysis.append("team's expertise and project needs. Consider running a small proof-of-concept to validate ");
+        analysis.append("the technology choice before full commitment.");
+        
+        return analysis.toString();
+    }
+    
+    /**
      * Get fallback decision questions
      */
     public List<String> getFallbackDecisionQuestions(List<String> technologies, UserConstraints constraints) {
@@ -101,6 +131,82 @@ public class InsightFallbackService {
         }
         
         return questions;
+    }
+
+    /**
+     * Generate mock technology scores
+     */
+    private List<TechnologyScore> generateMockTechnologyScores(List<String> technologies) {
+        List<TechnologyScore> scores = new ArrayList<>();
+        
+        for (int i = 0; i < technologies.size(); i++) {
+            String techName = technologies.get(i);
+            Technology mockTechnology = createMockTechnology(techName, i + 1);
+            
+            TechnologyFallbackData fallbackData = fallbackDatabase.get(techName.toLowerCase());
+            Map<String, Double> criterionScores = new HashMap<>();
+            double overallScore;
+            
+            if (fallbackData != null) {
+                criterionScores = fallbackData.getCriterionScores();
+                overallScore = criterionScores.values().stream()
+                    .mapToDouble(Double::doubleValue)
+                    .average()
+                    .orElse(75.0);
+            } else {
+                // Generate reasonable scores for unknown technologies
+                criterionScores.put("Performance", 70.0 + (Math.random() * 20.0));
+                criterionScores.put("Learning Curve", 65.0 + (Math.random() * 25.0));
+                criterionScores.put("Community", 60.0 + (Math.random() * 30.0));
+                criterionScores.put("Documentation", 70.0 + (Math.random() * 20.0));
+                criterionScores.put("Scalability", 65.0 + (Math.random() * 25.0));
+                
+                overallScore = criterionScores.values().stream()
+                    .mapToDouble(Double::doubleValue)
+                    .average()
+                    .orElse(75.0);
+            }
+            
+            String explanation = String.format("Mock analysis for %s: This technology shows balanced performance across criteria.", techName);
+            TechnologyScore score = new TechnologyScore(mockTechnology, overallScore, criterionScores, explanation);
+            scores.add(score);
+        }
+        
+        return scores;
+    }
+    
+    /**
+     * Create a mock Technology entity for testing
+     */
+    private Technology createMockTechnology(String name, long id) {
+        Technology technology = new Technology(name, "Mock Category");
+        technology.setDescription("Mock technology for testing: " + name);
+        
+        // Use reflection to set the ID for testing purposes
+        try {
+            var idField = Technology.class.getDeclaredField("id");
+            idField.setAccessible(true);
+            idField.set(technology, id);
+        } catch (Exception e) {
+            log.warn("Could not set mock technology ID: {}", e.getMessage());
+        }
+        
+        // Add some mock metrics
+        Map<String, Double> metrics = new HashMap<>();
+        metrics.put("github_stars", 10000.0 + (Math.random() * 50000.0));
+        metrics.put("npm_downloads", 100000.0 + (Math.random() * 1000000.0));
+        metrics.put("job_openings", 500.0 + (Math.random() * 5000.0));
+        metrics.put("satisfaction_score", 3.5 + (Math.random() * 1.5));
+        technology.setMetrics(metrics);
+        
+        // Add some mock tags
+        Set<String> tags = new HashSet<>();
+        tags.add("mock");
+        tags.add("testing");
+        tags.add(name.toLowerCase().replaceAll("[^a-z0-9]", ""));
+        technology.setTags(tags);
+        
+        return technology;
     }
 
     /**
@@ -307,6 +413,10 @@ public class InsightFallbackService {
         
         public Double getScoreForCriterion(String criterion) {
             return criterionScores.getOrDefault(criterion, 75.0); // Default score
+        }
+        
+        public Map<String, Double> getCriterionScores() {
+            return new HashMap<>(criterionScores);
         }
         
         public List<String> getStrengths() { return new ArrayList<>(strengths); }

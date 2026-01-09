@@ -100,15 +100,16 @@ public class InsightServiceImpl implements InsightService {
             throw new IllegalArgumentException("Technology names cannot be null or empty");
         }
         
-        if (technologyNames.size() < 2) {
-            return "Trade-off analysis requires at least two technologies for comparison.";
-        }
-        
         try {
             String aiAnalysis = geminiService.generateTradeOffAnalysis(technologyNames);
             
-            // Enhance with structured trade-off analysis
-            String structuredAnalysis = recommendationEngine.generateStructuredTradeOffAnalysis(technologyNames);
+            // Enhance with structured analysis (works for both single and multiple technologies)
+            String structuredAnalysis;
+            if (technologyNames.size() == 1) {
+                structuredAnalysis = recommendationEngine.generateSingleTechnologyAnalysis(technologyNames.get(0));
+            } else {
+                structuredAnalysis = recommendationEngine.generateStructuredTradeOffAnalysis(technologyNames);
+            }
             
             return aiAnalysis + "\n\n" + structuredAnalysis;
             
