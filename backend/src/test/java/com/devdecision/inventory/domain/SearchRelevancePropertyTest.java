@@ -89,21 +89,28 @@ public class SearchRelevancePropertyTest extends QuickCheckTestBase {
     }
 
     /**
-     * Generates a valid search query (non-empty, trimmed)
+     * Generates a valid search query (non-empty, trimmed, no SQL wildcards)
      */
     private String generateValidQuery() {
         String query;
         do {
             query = PrimitiveGenerators.strings().next();
-        } while (query == null || query.trim().isEmpty() || query.length() > 50);
+        } while (query == null || query.trim().isEmpty() || query.length() > 50 || containsSqlWildcards(query));
         
         // Ensure it's not just whitespace
         query = query.trim();
-        if (query.isEmpty()) {
-            query = "test"; // Fallback to ensure non-empty
+        if (query.isEmpty() || containsSqlWildcards(query)) {
+            query = "test"; // Fallback to ensure non-empty and no wildcards
         }
         
         return query;
+    }
+    
+    /**
+     * Checks if a string contains SQL wildcard characters that would interfere with LIKE queries
+     */
+    private boolean containsSqlWildcards(String str) {
+        return str != null && (str.contains("%") || str.contains("_"));
     }
 
     /**

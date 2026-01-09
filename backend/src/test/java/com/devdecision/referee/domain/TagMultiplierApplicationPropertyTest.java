@@ -112,8 +112,9 @@ public class TagMultiplierApplicationPropertyTest extends QuickCheckTestBase {
         Technology tech = new Technology(uniqueName, category, "Test description for tag multiplier");
         
         // Add metrics for all criteria types with predictable values
+        // Keep values low enough so that 1.5x multiplier won't exceed 100 after normalization
         Map<String, Double> metrics = new HashMap<>();
-        double baseValue = 50.0 + (index * 10.0); // 50, 60, 70, etc.
+        double baseValue = 30.0 + (index * 10.0); // 30, 40, 50, etc. - low enough for multiplier effect
         
         metrics.put("performance_score", baseValue);
         metrics.put("learning_curve_score", baseValue + 5.0);

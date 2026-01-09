@@ -111,6 +111,9 @@ public class WeightedScoringServiceImpl implements WeightedScoringService {
                 // Apply tag multiplier after normalization
                 double adjustedScore = applyTagMultipliers(normalizedScore, constraints, criterion.getType().name());
                 
+                // Ensure adjusted score stays within valid range after multiplier
+                adjustedScore = Math.max(MIN_SCORE, Math.min(MAX_SCORE, adjustedScore));
+                
                 // Apply criterion weight
                 double weightedScore = adjustedScore * criterion.getWeight();
                 
