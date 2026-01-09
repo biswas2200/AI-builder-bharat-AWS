@@ -145,7 +145,8 @@ This implementation plan breaks down the DevDecision tech stack comparison tool 
     - Handle loading states and error boundaries
     - _Requirements: 8.5_
 
-  - [ ]* 7.3 Write property test for session persistence round trip
+  - [x] 7.3 Write property test for session persistence round trip
+
     - **Property 18: Session Persistence Round Trip**
     - **Validates: Requirements 8.5**
 
