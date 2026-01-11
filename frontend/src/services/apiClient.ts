@@ -3,7 +3,7 @@ import { ApiError } from '../types/api';
 
 // Create axios instance with base configuration
 const apiClient: AxiosInstance = axios.create({
-  baseURL: process.env.VITE_API_BASE_URL || 'http://localhost:8080/api',
+  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api',
   timeout: 10000, // 10 second timeout
   headers: {
     'Content-Type': 'application/json',
@@ -14,7 +14,7 @@ const apiClient: AxiosInstance = axios.create({
 apiClient.interceptors.request.use(
   (config) => {
     // Log requests in development
-    if (process.env.NODE_ENV === 'development') {
+    if (import.meta.env.DEV) {
       console.log(`API Request: ${config.method?.toUpperCase()} ${config.url}`);
     }
     
@@ -36,7 +36,7 @@ apiClient.interceptors.request.use(
 apiClient.interceptors.response.use(
   (response: AxiosResponse) => {
     // Log successful responses in development
-    if (process.env.NODE_ENV === 'development') {
+    if (import.meta.env.DEV) {
       console.log(`API Response: ${response.status} ${response.config.url}`);
     }
     return response;
@@ -71,7 +71,7 @@ apiClient.interceptors.response.use(
     }
 
     // Log errors in development
-    if (process.env.NODE_ENV === 'development') {
+    if (import.meta.env.DEV) {
       console.error('API Error:', apiError);
     }
 

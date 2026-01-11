@@ -35,17 +35,26 @@ public class GeminiService {
     private final GenerativeModel model;
     private final ObjectMapper objectMapper;
     private final InsightFallbackService fallbackService;
-    
-    @Value("${google.cloud.project-id:devdecision-project}")
-    private String projectId;
-    
-    @Value("${google.cloud.location:us-central1}")
-    private String location;
+    private final String projectId;
+    private final String location;
+    private final String credentialsPath;
 
     public GeminiService(@Qualifier("geminiObjectMapper") ObjectMapper objectMapper, 
-                        InsightFallbackService fallbackService) {
+                        InsightFallbackService fallbackService,
+                        @Value("${google.cloud.project-id:ai-refree-aws}") String projectId,
+                        @Value("${google.cloud.location:us-central1}") String location,
+                        @Value("${google.cloud.credentials:ai-refree-aws-814936425b85.json}") String credentialsPath) {
         this.objectMapper = objectMapper;
         this.fallbackService = fallbackService;
+        this.projectId = projectId;
+        this.location = location;
+        this.credentialsPath = credentialsPath;
+        
+        // Set the credentials path as environment variable if not already set
+        if (System.getenv("GOOGLE_APPLICATION_CREDENTIALS") == null) {
+            System.setProperty("GOOGLE_APPLICATION_CREDENTIALS", credentialsPath);
+        }
+        
         this.vertexAI = new VertexAI(projectId, location);
         this.model = new GenerativeModel("gemini-1.5-flash", vertexAI);
     }

@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -14,6 +15,7 @@ import java.util.Objects;
  * Implements cache-aside pattern with proactive eviction strategies.
  */
 @Service
+@Profile("!test & !standalone")
 public class CacheEvictionService {
 
     private static final Logger log = LoggerFactory.getLogger(CacheEvictionService.class);

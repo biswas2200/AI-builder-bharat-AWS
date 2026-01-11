@@ -28,7 +28,7 @@ import java.util.Properties;
 @Configuration
 @EnableTransactionManagement
 @EnableJpaRepositories(basePackages = "com.devdecision")
-@Profile("!test") // Exclude from test profile to avoid conflicts
+@Profile("production") // Only active in production profile, not in default, test, or standalone
 public class PerformanceConfig {
 
     @Value("${spring.datasource.url}")
@@ -49,7 +49,7 @@ public class PerformanceConfig {
      */
     @Bean
     @Primary
-    @ConditionalOnProperty(name = "spring.datasource.url", havingValue = "jdbc:postgresql", matchIfMissing = false)
+    @ConditionalOnProperty(name = "spring.datasource.url", havingValue = "jdbc:postgresql://localhost:5432/devdecision")
     public DataSource dataSource() {
         HikariConfig config = new HikariConfig();
         
@@ -119,11 +119,11 @@ public class PerformanceConfig {
         properties.setProperty("hibernate.order_updates", "true");
         properties.setProperty("hibernate.batch_versioned_data", "true");
         
-        // Second-level cache (Redis integration)
-        properties.setProperty("hibernate.cache.use_second_level_cache", "true");
-        properties.setProperty("hibernate.cache.use_query_cache", "true");
-        properties.setProperty("hibernate.cache.region.factory_class", 
-            "org.hibernate.cache.jcache.JCacheRegionFactory");
+        // Second-level cache (disabled for now - can be enabled with Redis later)
+        properties.setProperty("hibernate.cache.use_second_level_cache", "false");
+        properties.setProperty("hibernate.cache.use_query_cache", "false");
+        // properties.setProperty("hibernate.cache.region.factory_class", 
+        //     "org.hibernate.cache.jcache.JCacheRegionFactory");
         
         // Connection handling
         properties.setProperty("hibernate.connection.provider_disables_autocommit", "true");

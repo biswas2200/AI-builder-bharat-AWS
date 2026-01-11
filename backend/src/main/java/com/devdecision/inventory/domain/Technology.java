@@ -7,6 +7,12 @@ import jakarta.validation.constraints.Size;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.persistence.AttributeConverter;
+import jakarta.persistence.Converter;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -48,14 +54,17 @@ public class Technology {
      * Contains metrics like: github_stars, npm_downloads, job_openings, 
      * satisfaction_score, performance_score, learning_curve_score, community_score
      */
-    @JdbcTypeCode(SqlTypes.JSON)
-    @Column(name = "metrics")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    @Convert(converter = MapToJsonConverter.class)
+    @Column(name = "metrics", columnDefinition = "TEXT")
     private Map<String, Double> metrics = new HashMap<>();
 
     /**
      * Technology tags for categorization and search
      */
-    @ElementCollection(fetch = FetchType.EAGER)
+    @JsonIgnore  // Ignore during JSON serialization to prevent lazy loading issues
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(name = "technology_tags", 
                     joinColumns = @JoinColumn(name = "technology_id"))
     @Column(name = "tag")
@@ -174,5 +183,39 @@ public class Technology {
                 ", tagsCount=" + tags.size() +
                 ", createdAt=" + createdAt +
                 '}';
+    }
+
+    /**
+     * JPA Converter for Map<String, Double> to JSON string
+     */
+    @Converter
+    public static class MapToJsonConverter implements AttributeConverter<Map<String, Double>, String> {
+        
+        private static final ObjectMapper objectMapper = new ObjectMapper();
+        
+        @Override
+        public String convertToDatabaseColumn(Map<String, Double> attribute) {
+            if (attribute == null || attribute.isEmpty()) {
+                return "{}";
+            }
+            try {
+                return objectMapper.writeValueAsString(attribute);
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException("Error converting map to JSON", e);
+            }
+        }
+        
+        @Override
+        public Map<String, Double> convertToEntityAttribute(String dbData) {
+            if (dbData == null || dbData.trim().isEmpty()) {
+                return new HashMap<>();
+            }
+            try {
+                return objectMapper.readValue(dbData, 
+                    objectMapper.getTypeFactory().constructMapType(HashMap.class, String.class, Double.class));
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException("Error converting JSON to map", e);
+            }
+        }
     }
 }

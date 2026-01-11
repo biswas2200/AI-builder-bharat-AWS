@@ -24,7 +24,7 @@ public class InsightServiceImpl implements InsightService {
     private final InsightFallbackService fallbackService;
     private final RecommendationEngine recommendationEngine;
 
-    public InsightServiceImpl(GeminiService geminiService, 
+    public InsightServiceImpl(GeminiService geminiService,
                              InsightFallbackService fallbackService,
                              RecommendationEngine recommendationEngine) {
         this.geminiService = geminiService;
