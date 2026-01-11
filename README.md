@@ -92,7 +92,10 @@ npm test
 ## Design System: "Neon & Void"
 
 - **Light Mode**: Soft purple gradients with clean white backgrounds
+     <img width="1837" height="922" alt="Screenshot 2026-01-11 221727" src="https://github.com/user-attachments/assets/75ed3310-3b8a-497d-80d6-2aff7827c274" />
 - **Dark Mode**: Deep void backgrounds with glowing purple accents
+  <img width="1846" height="918" alt="Screenshot 2026-01-11 202906" src="https://github.com/user-attachments/assets/c4ccf16c-9910-4903-80d2-cb6d2c48a984" />
+
 - **Interactive Effects**: Glassmorphism, hover animations, and neon glows
 - **Responsive Design**: Mobile-first approach with Tailwind CSS
 
