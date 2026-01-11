@@ -42,7 +42,7 @@ export class ErrorBoundary extends Component<Props, State> {
     });
 
     // Log error to console in development
-    if (process.env.NODE_ENV === 'development') {
+    if (import.meta.env.DEV) {
       console.error('ErrorBoundary caught an error:', error, errorInfo);
     }
 
@@ -84,7 +84,7 @@ export class ErrorBoundary extends Component<Props, State> {
               We encountered an unexpected error. Please try refreshing the page or contact support if the problem persists.
             </p>
 
-            {process.env.NODE_ENV === 'development' && this.state.error && (
+            {import.meta.env.DEV && this.state.error && (
               <details className="mb-4 p-3 bg-gray-100 dark:bg-slate-800 rounded border">
                 <summary className="cursor-pointer text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Error Details (Development)

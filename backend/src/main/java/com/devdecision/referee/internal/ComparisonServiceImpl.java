@@ -9,6 +9,7 @@ import com.devdecision.referee.domain.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.transaction.annotation.Transactional;
 import java.text.DecimalFormat;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -33,6 +34,7 @@ public class ComparisonServiceImpl implements ComparisonService {
 
     @Override
     @Cacheable(value = "comparisons", key = "#technologyIds.toString() + ':' + #constraints.hashCode()")
+    @Transactional(readOnly = true)
     public ComparisonResult generateComparison(List<Long> technologyIds, UserConstraints constraints) {
         log.info("Generating comparison for {} technologies", technologyIds.size());
         
@@ -79,6 +81,7 @@ public class ComparisonServiceImpl implements ComparisonService {
 
     @Override
     @Cacheable(value = "comparisons", key = "#technologyNames.toString() + ':' + #constraints.hashCode()")
+    @Transactional(readOnly = true)
     public ComparisonResult generateComparisonByNames(List<String> technologyNames, UserConstraints constraints) {
         log.info("Generating comparison for technologies by names: {}", technologyNames);
         
@@ -152,67 +155,87 @@ public class ComparisonServiceImpl implements ComparisonService {
             Technology technology = score.getTechnology();
             List<KpiMetric> metrics = new ArrayList<>();
             
-            // GitHub Stars
-            Double githubStars = technology.getMetric("github_stars");
-            if (githubStars != null) {
+            try {
+                // Safely access metrics (they should always be available)
+                Map<String, Double> techMetrics = technology.getMetrics();
+                if (techMetrics == null) {
+                    techMetrics = new HashMap<>();
+                }
+                
+                // GitHub Stars
+                Double githubStars = techMetrics.get("github_stars");
+                if (githubStars != null) {
+                    metrics.add(new KpiMetric(
+                        "GitHub Stars",
+                        githubStars,
+                        NUMBER_FORMAT.format(githubStars.longValue()),
+                        "stars",
+                        "Community popularity on GitHub",
+                        KpiMetric.KpiMetricType.COUNT
+                    ));
+                }
+                
+                // NPM Downloads
+                Double npmDownloads = techMetrics.get("npm_downloads");
+                if (npmDownloads != null) {
+                    metrics.add(new KpiMetric(
+                        "NPM Downloads",
+                        npmDownloads,
+                        formatLargeNumber(npmDownloads),
+                        "downloads/month",
+                        "Monthly NPM package downloads",
+                        KpiMetric.KpiMetricType.COUNT
+                    ));
+                }
+                
+                // Job Openings
+                Double jobOpenings = techMetrics.get("job_openings");
+                if (jobOpenings != null) {
+                    metrics.add(new KpiMetric(
+                        "Job Openings",
+                        jobOpenings,
+                        NUMBER_FORMAT.format(jobOpenings.longValue()),
+                        "jobs",
+                        "Current job market demand",
+                        KpiMetric.KpiMetricType.COUNT
+                    ));
+                }
+                
+                // Satisfaction Score
+                Double satisfactionScore = techMetrics.get("satisfaction_score");
+                if (satisfactionScore != null) {
+                    metrics.add(new KpiMetric(
+                        "Satisfaction",
+                        satisfactionScore,
+                        DECIMAL_FORMAT.format(satisfactionScore) + "/5",
+                        "stars",
+                        "Developer satisfaction rating",
+                        KpiMetric.KpiMetricType.RATING
+                    ));
+                }
+                
+                // Overall Score - always add this
                 metrics.add(new KpiMetric(
-                    "GitHub Stars",
-                    githubStars,
-                    NUMBER_FORMAT.format(githubStars.longValue()),
-                    "stars",
-                    "Community popularity on GitHub",
-                    KpiMetric.KpiMetricType.COUNT
+                    "Overall Score",
+                    score.getOverallScore(),
+                    DECIMAL_FORMAT.format(score.getOverallScore()),
+                    "points",
+                    "Weighted overall comparison score",
+                    KpiMetric.KpiMetricType.NUMERIC
+                ));
+                
+            } catch (Exception e) {
+                log.warn("Error generating KPI metrics for technology {}: {}", technology.getName(), e.getMessage());
+                // Add at least the overall score
+                metrics.add(new KpiMetric(
+                    "Overall Score",
+                    score.getOverallScore(),
+                    DECIMAL_FORMAT.format(score.getOverallScore()),
+                    "points",
+                    "Weighted overall comparison score",
+                    KpiMetric.KpiMetricType.NUMERIC
                 ));
             }
-            
-            // NPM Downloads
-            Double npmDownloads = technology.getMetric("npm_downloads");
-            if (npmDownloads != null) {
-                metrics.add(new KpiMetric(
-                    "NPM Downloads",
-                    npmDownloads,
-                    formatLargeNumber(npmDownloads),
-                    "downloads/month",
-                    "Monthly NPM package downloads",
-                    KpiMetric.KpiMetricType.COUNT
-                ));
-            }
-            
-            // Job Openings
-            Double jobOpenings = technology.getMetric("job_openings");
-            if (jobOpenings != null) {
-                metrics.add(new KpiMetric(
-                    "Job Openings",
-                    jobOpenings,
-                    NUMBER_FORMAT.format(jobOpenings.longValue()),
-                    "jobs",
-                    "Current job market demand",
-                    KpiMetric.KpiMetricType.COUNT
-                ));
-            }
-            
-            // Satisfaction Score
-            Double satisfactionScore = technology.getMetric("satisfaction_score");
-            if (satisfactionScore != null) {
-                metrics.add(new KpiMetric(
-                    "Satisfaction",
-                    satisfactionScore,
-                    DECIMAL_FORMAT.format(satisfactionScore) + "/5",
-                    "stars",
-                    "Developer satisfaction rating",
-                    KpiMetric.KpiMetricType.RATING
-                ));
-            }
-            
-            // Overall Score
-            metrics.add(new KpiMetric(
-                "Overall Score",
-                score.getOverallScore(),
-                DECIMAL_FORMAT.format(score.getOverallScore()),
-                "points",
-                "Weighted overall comparison score",
-                KpiMetric.KpiMetricType.NUMERIC
-            ));
             
             kpiMetrics.put(technology.getName(), metrics);
         }

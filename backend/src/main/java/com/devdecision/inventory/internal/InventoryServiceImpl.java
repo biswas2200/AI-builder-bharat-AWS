@@ -96,15 +96,27 @@ public class InventoryServiceImpl implements InventoryService {
             return List.of();
         }
         
-        // Use optimized batch query for comparison operations
-        return technologyRepository.findByIdsWithTags(ids);
+        try {
+            // Use optimized batch query for comparison operations
+            return technologyRepository.findByIdsWithTags(ids);
+        } catch (Exception e) {
+            logger.warn("Failed to use optimized query, falling back to basic findAllById: {}", e.getMessage());
+            // Fallback to basic query without tags
+            return technologyRepository.findAllById(ids);
+        }
     }
 
     @Override
     @Cacheable(value = "technologies", key = "'all'")
+    @Transactional(readOnly = true)
     public List<Technology> getAllTechnologies() {
         logger.debug("Getting all technologies");
-        return technologyRepository.findAll();
+        List<Technology> technologies = technologyRepository.findAll();
+        // Force initialization of lazy collections within transaction
+        technologies.forEach(tech -> {
+            tech.getTags().size(); // This forces Hibernate to load the tags
+        });
+        return technologies;
     }
 
     @Override

@@ -1,0 +1,60 @@
+spring:
+  application:
+    name: devdecision-backend
+  
+  # H2 In-Memory Database (for testing without Docker)
+  datasource:
+    url: jdbc:h2:mem:devdecision;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    password: 
+    driver-class-name: org.h2.Driver
+  
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+        format_sql: true
+  
+  # Disable Redis for standalone mode
+  cache:
+    type: simple
+  
+  data:
+    redis:
+      repositories:
+        enabled: false
+
+server:
+  port: 8080
+
+logging:
+  level:
+    com.devdecision: DEBUG
+    org.springframework.modulith: DEBUG
+
+# Google Cloud Vertex AI Configuration
+google:
+  cloud:
+    project-id: ${GOOGLE_CLOUD_PROJECT_ID:ai-refree-aws}
+    location: ${GOOGLE_CLOUD_LOCATION:us-central1}
+    credentials: ${GOOGLE_APPLICATION_CREDENTIALS:./ai-refree-aws-814936425b85.json}
+
+# Custom application properties
+devdecision:
+  gemini:
+    model-name: gemini-1.5-flash
+    max-retries: 3
+    timeout: 30s
+  cache:
+    technology-ttl: 3600 # 1 hour
+    comparison-ttl: 1800 # 30 minutes
+  performance:
+    max-comparison-time-ms: 500 # Requirement 8.4: 500ms response time

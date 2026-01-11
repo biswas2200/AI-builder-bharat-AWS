@@ -140,6 +140,13 @@ web_modules/
 .env.production.local
 .env.local
 
+# Google Cloud credentials - NEVER commit these!
+*.json
+ai-refree-aws-*.json
+*-service-account.json
+google-credentials.json
+gcp-*.json
+
 # parcel-bundler cache (https://parceljs.org/)
 .cache
 .parcel-cache
@@ -183,3 +190,8 @@ temp/
 .Trashes
 ehthumbs.db
 Thumbs.db
+
+# Development documentation and reports
+KIRO_DEVELOPMENT_STORY.md
+API_TEST_REPORT.md
+test-api.sh

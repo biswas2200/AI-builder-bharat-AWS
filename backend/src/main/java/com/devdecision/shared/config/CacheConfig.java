@@ -23,7 +23,7 @@ import java.util.Map;
  */
 @Configuration
 @EnableCaching
-@Profile("!test")
+@Profile("!test & !standalone")
 public class CacheConfig {
 
     @Value("${devdecision.cache.technology-ttl:3600}")

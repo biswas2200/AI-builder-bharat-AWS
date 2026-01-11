@@ -39,10 +39,14 @@ public class DataSeedingService implements CommandLineRunner {
     public void run(String... args) {
         log.info("Starting database seeding process...");
         
-        seedCriteria();
-        seedTechnologies();
-        
-        log.info("Database seeding completed successfully");
+        try {
+            seedCriteria();
+            seedTechnologies();
+            log.info("Database seeding completed successfully");
+        } catch (Exception e) {
+            log.error("Database seeding failed", e);
+            throw e;
+        }
     }
 
     private void seedCriteria() {
@@ -106,7 +110,7 @@ public class DataSeedingService implements CommandLineRunner {
         metrics.put("learning_curve_score", 7.3);
         metrics.put("community_score", 9.8);
         tech.setMetrics(metrics);
-        tech.setTags(Set.of("javascript", "frontend", "spa", "component-based", "popular"));
+        // tech.setTags(Set.of("javascript", "frontend", "popular")); // Temporarily disabled for faster startup
         
         return tech;
     }
@@ -124,7 +128,7 @@ public class DataSeedingService implements CommandLineRunner {
         metrics.put("learning_curve_score", 8.9);
         metrics.put("community_score", 8.7);
         tech.setMetrics(metrics);
-        tech.setTags(Set.of("javascript", "frontend", "progressive", "easy-to-learn"));
+        // tech.setTags(Set.of("javascript", "frontend", "progressive")); // Temporarily disabled for faster startup
         
         return tech;
     }
@@ -142,7 +146,7 @@ public class DataSeedingService implements CommandLineRunner {
         metrics.put("learning_curve_score", 6.2);
         metrics.put("community_score", 8.9);
         tech.setMetrics(metrics);
-        tech.setTags(Set.of("typescript", "frontend", "enterprise", "full-featured"));
+        // tech.setTags(Set.of("typescript", "frontend", "enterprise")); // Temporarily disabled for faster startup
         
         return tech;
     }
@@ -160,7 +164,7 @@ public class DataSeedingService implements CommandLineRunner {
         metrics.put("learning_curve_score", 8.1);
         metrics.put("community_score", 9.6);
         tech.setMetrics(metrics);
-        tech.setTags(Set.of("javascript", "backend", "runtime", "fast"));
+        // tech.setTags(Set.of("javascript", "backend", "runtime")); // Temporarily disabled for faster startup
         
         return tech;
     }
@@ -177,7 +181,7 @@ public class DataSeedingService implements CommandLineRunner {
         metrics.put("learning_curve_score", 6.8);
         metrics.put("community_score", 9.0);
         tech.setMetrics(metrics);
-        tech.setTags(Set.of("java", "backend", "enterprise", "microservices"));
+        // tech.setTags(Set.of("java", "backend", "enterprise")); // Temporarily disabled for faster startup
         
         return tech;
     }
@@ -194,7 +198,7 @@ public class DataSeedingService implements CommandLineRunner {
         metrics.put("learning_curve_score", 7.4);
         metrics.put("community_score", 9.1);
         tech.setMetrics(metrics);
-        tech.setTags(Set.of("sql", "relational", "acid", "open-source"));
+        // tech.setTags(Set.of("sql", "relational", "open-source")); // Temporarily disabled for faster startup
         
         return tech;
     }
@@ -211,7 +215,7 @@ public class DataSeedingService implements CommandLineRunner {
         metrics.put("learning_curve_score", 8.5);
         metrics.put("community_score", 8.9);
         tech.setMetrics(metrics);
-        tech.setTags(Set.of("cache", "in-memory", "fast", "key-value"));
+        // tech.setTags(Set.of("cache", "in-memory", "fast")); // Temporarily disabled for faster startup
         
         return tech;
     }
@@ -228,7 +232,7 @@ public class DataSeedingService implements CommandLineRunner {
         metrics.put("learning_curve_score", 7.8);
         metrics.put("community_score", 9.5);
         tech.setMetrics(metrics);
-        tech.setTags(Set.of("containers", "devops", "deployment", "microservices"));
+        // tech.setTags(Set.of("containers", "devops", "deployment")); // Temporarily disabled for faster startup
         
         return tech;
     }
@@ -245,7 +249,7 @@ public class DataSeedingService implements CommandLineRunner {
         metrics.put("learning_curve_score", 6.5);
         metrics.put("community_score", 9.3);
         tech.setMetrics(metrics);
-        tech.setTags(Set.of("cloud", "infrastructure", "scalability", "enterprise"));
+        // tech.setTags(Set.of("cloud", "infrastructure", "enterprise")); // Temporarily disabled for faster startup
         
         return tech;
     }

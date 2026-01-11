@@ -1,11 +1,12 @@
 package com.devdecision.api;
 
 import com.devdecision.inventory.api.InventoryService;
+import com.devdecision.inventory.domain.Criteria;
+import com.devdecision.inventory.domain.Technology;
 import com.devdecision.referee.api.ComparisonService;
 import com.devdecision.insight.api.InsightService;
 import com.devdecision.referee.domain.ComparisonResult;
 import com.devdecision.referee.domain.UserConstraints;
-import com.devdecision.inventory.domain.Technology;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
@@ -20,6 +21,9 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Set;
 import java.util.HashSet;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -46,6 +50,76 @@ public class ComparisonController {
         this.inventoryService = inventoryService;
         this.comparisonService = comparisonService;
         this.insightService = insightService;
+    }
+
+    /**
+     * Simple test endpoint to verify basic functionality
+     */
+    @PostMapping("/test")
+    public ResponseEntity<Map<String, Object>> testComparison(@Valid @RequestBody ComparisonRequest request) {
+        logger.info("POST /api/comparison/test - Testing with {} technologies", request.technologyIds().size());
+        
+        try {
+            // Simple response without complex logic
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "Test successful");
+            response.put("technologyIds", request.technologyIds());
+            response.put("priorityTags", request.priorityTags());
+            response.put("projectType", request.projectType());
+            response.put("timestamp", System.currentTimeMillis());
+            
+            return ResponseEntity.ok(response);
+            
+        } catch (Exception e) {
+            logger.error("Error in test comparison", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    /**
+     * Debug endpoint to test individual service components
+     */
+    @PostMapping("/debug")
+    public ResponseEntity<Map<String, Object>> debugComparison(@Valid @RequestBody ComparisonRequest request) {
+        logger.info("POST /api/comparison/debug - Debugging with {} technologies", request.technologyIds().size());
+        
+        Map<String, Object> response = new HashMap<>();
+        
+        try {
+            // Test 1: Check if technologies exist
+            List<Technology> technologies = request.technologyIds().stream()
+                .map(id -> inventoryService.findTechnologyById(id))
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(Collectors.toList());
+            
+            response.put("step1_technologies_found", technologies.size());
+            response.put("step1_technology_names", technologies.stream().map(Technology::getName).collect(Collectors.toList()));
+            
+            // Test 2: Create user constraints
+            UserConstraints constraints = new UserConstraints(
+                request.priorityTags(),
+                request.projectType(),
+                request.teamSize(),
+                request.timeline()
+            );
+            
+            response.put("step2_constraints_created", true);
+            response.put("step2_priority_tags", constraints.priorityTags());
+            
+            // Test 3: Try to get all criteria
+            List<Criteria> allCriteria = inventoryService.getAllCriteria();
+            response.put("step3_criteria_found", allCriteria.size());
+            
+            response.put("status", "debug_successful");
+            return ResponseEntity.ok(response);
+            
+        } catch (Exception e) {
+            logger.error("Error in debug comparison", e);
+            response.put("error", e.getMessage());
+            response.put("error_class", e.getClass().getSimpleName());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
     }
 
     /**
@@ -174,6 +248,30 @@ public class ComparisonController {
     }
 
     /**
+     * Simple test endpoint for insights service
+     */
+    @PostMapping("/insights-test")
+    public ResponseEntity<Map<String, Object>> testInsights(@Valid @RequestBody InsightRequest request) {
+        logger.info("POST /api/comparison/insights-test - Testing insights with: {}", request.technologyNames());
+        
+        try {
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "Insights test successful");
+            response.put("technologyNames", request.technologyNames());
+            response.put("timestamp", System.currentTimeMillis());
+            
+            return ResponseEntity.ok(response);
+            
+        } catch (Exception e) {
+            logger.error("Error in insights test", e);
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("error", e.getMessage());
+            errorResponse.put("errorClass", e.getClass().getSimpleName());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+        }
+    }
+
+    /**
      * Generate AI insights for a list of technologies without full comparison.
      * 
      * @param request Insight request with technology names
@@ -186,15 +284,27 @@ public class ComparisonController {
         try {
             UserConstraints constraints = request.constraints() != null ? request.constraints() : UserConstraints.empty();
             
+            logger.debug("About to call insightService.generatePersonalizedInsights with technologies: {} and constraints: {}", 
+                        request.technologyNames(), constraints);
+            
             ComparisonResult insights = insightService.generatePersonalizedInsights(
                 request.technologyNames(), 
                 constraints
             );
             
+            logger.info("Successfully generated insights for: {}", request.technologyNames());
             return ResponseEntity.ok(insights);
             
         } catch (Exception e) {
-            logger.error("Error generating insights", e);
+            logger.error("Error generating insights for technologies: {}", request.technologyNames(), e);
+            
+            // Return detailed error information for debugging
+            Map<String, Object> errorDetails = new HashMap<>();
+            errorDetails.put("error", e.getMessage());
+            errorDetails.put("errorClass", e.getClass().getSimpleName());
+            errorDetails.put("technologyNames", request.technologyNames());
+            errorDetails.put("timestamp", System.currentTimeMillis());
+            
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }

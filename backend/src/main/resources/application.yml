@@ -3,9 +3,9 @@ spring:
     name: devdecision-backend
   
   datasource:
-    url: jdbc:postgresql://localhost:5432/devdecision
+    url: jdbc:postgresql://127.0.0.1:5432/devdecision
     username: ${DB_USERNAME:devdecision}
-    password: ${DB_PASSWORD:devdecision}
+    password: devdecision
     driver-class-name: org.postgresql.Driver
   
   jpa:
@@ -16,6 +16,10 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
+        jdbc:
+          batch_size: 20
+        order_inserts: true
+        order_updates: true
   
   data:
     redis:
@@ -49,8 +53,9 @@ logging:
 # Google Cloud Vertex AI Configuration
 google:
   cloud:
-    project-id: ${GOOGLE_CLOUD_PROJECT_ID:}
+    project-id: ${GOOGLE_CLOUD_PROJECT_ID:ai-refree-aws}
     location: ${GOOGLE_CLOUD_LOCATION:us-central1}
+    credentials: ${GOOGLE_APPLICATION_CREDENTIALS:ai-refree-aws-814936425b85.json}
 
 # Custom application properties
 devdecision:
@@ -63,3 +68,41 @@ devdecision:
     comparison-ttl: 1800 # 30 minutes
   performance:
     max-comparison-time-ms: 500 # Requirement 8.4: 500ms response time
+
+---
+# Standalone profile - uses H2 database for development without Docker
+spring:
+  config:
+    activate:
+      on-profile: standalone
+  
+  datasource:
+    url: jdbc:h2:mem:devdecision;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: 
+  
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+        jdbc:
+          batch_size: 20
+        order_inserts: true
+        order_updates: true
+  
+  data:
+    redis:
+      repositories:
+        enabled: false
+  
+  cache:
+    type: simple # Use simple cache instead of Redis
+  
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration
+      - org.springframework.boot.autoconfigure.data.redis.RedisRepositoriesAutoConfiguration

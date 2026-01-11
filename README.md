@@ -39,6 +39,25 @@ devdecision/
 - Node.js 18+
 - Docker and Docker Compose
 - Maven 3.8+
+- Google Cloud Project with Vertex AI API enabled
+
+### Configuration
+
+1. **Google Cloud Setup:**
+   - Create a Google Cloud project
+   - Enable Vertex AI API
+   - Create a service account and download the JSON key file
+   - Place the key file in the root directory (it's already gitignored)
+
+2. **Environment Configuration:**
+   ```bash
+   # Copy the environment template
+   cp .env.example .env
+   
+   # Edit .env with your actual values
+   # The Google Cloud credentials file is already configured to point to:
+   # ai-refree-aws-814936425b85.json (in root directory)
+   ```
 
 ### Local Development Setup
 
@@ -62,8 +81,30 @@ devdecision/
    ```
 
 4. **Access the application:**
-   - Frontend: http://localhost:3000
+   - Frontend: http://localhost:3000 (or next available port)
    - Backend API: http://localhost:8080
+
+### Standalone Development (No Docker Required)
+
+For development without Docker dependencies:
+
+1. **Backend setup:**
+   ```bash
+   cd backend
+   $env:SPRING_PROFILES_ACTIVE='standalone'; mvn spring-boot:run
+   ```
+
+2. **Frontend setup:**
+   ```bash
+   cd frontend
+   npm install
+   npm run dev
+   ```
+
+3. **Access the application:**
+   - Frontend: http://localhost:3000 (or next available port)
+   - Backend API: http://localhost:8080
+   - H2 Database Console: http://localhost:8080/h2-console
 
 ### Running Tests
 

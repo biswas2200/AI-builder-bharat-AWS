@@ -100,39 +100,68 @@ public class WeightedScoringServiceImpl implements WeightedScoringService {
         double totalWeightedScore = 0.0;
         double totalWeight = 0.0;
         
-        for (Criteria criterion : criteria) {
-            String criterionKey = mapCriteriaTypeToMetricKey(criterion.getType().name());
-            Double rawScore = technology.getMetric(criterionKey);
-            
-            if (rawScore != null) {
-                // Normalize score to 0-100 scale first
-                double normalizedScore = normalizeScore(rawScore);
-                
-                // Apply tag multiplier after normalization
-                double adjustedScore = applyTagMultipliers(normalizedScore, constraints, criterion.getType().name());
-                
-                // Ensure adjusted score stays within valid range after multiplier
-                adjustedScore = Math.max(MIN_SCORE, Math.min(MAX_SCORE, adjustedScore));
-                
-                // Apply criterion weight
-                double weightedScore = adjustedScore * criterion.getWeight();
-                
-                criterionScores.put(criterion.getName(), adjustedScore);
-                totalWeightedScore += weightedScore;
-                totalWeight += criterion.getWeight();
-                
-                log.debug("Criterion {}: raw={}, normalized={}, adjusted={}, weighted={}", 
-                         criterion.getName(), rawScore, normalizedScore, adjustedScore, weightedScore);
+        try {
+            for (Criteria criterion : criteria) {
+                try {
+                    String criterionKey = mapCriteriaTypeToMetricKey(criterion.getType().name());
+                    Double rawScore = technology.getMetric(criterionKey);
+                    
+                    if (rawScore != null) {
+                        // Normalize score to 0-100 scale first
+                        double normalizedScore = normalizeScore(rawScore);
+                        
+                        // Apply tag multiplier after normalization
+                        double adjustedScore = applyTagMultipliers(normalizedScore, constraints, criterion.getType().name());
+                        
+                        // Ensure adjusted score stays within valid range after multiplier
+                        adjustedScore = Math.max(MIN_SCORE, Math.min(MAX_SCORE, adjustedScore));
+                        
+                        // Apply criterion weight
+                        double weightedScore = adjustedScore * criterion.getWeight();
+                        
+                        criterionScores.put(criterion.getName(), adjustedScore);
+                        totalWeightedScore += weightedScore;
+                        totalWeight += criterion.getWeight();
+                        
+                        log.debug("Criterion {}: raw={}, normalized={}, adjusted={}, weighted={}", 
+                                 criterion.getName(), rawScore, normalizedScore, adjustedScore, weightedScore);
+                    } else {
+                        // Use default score for missing metrics
+                        double defaultScore = 50.0; // Neutral score
+                        double adjustedScore = applyTagMultipliers(defaultScore, constraints, criterion.getType().name());
+                        adjustedScore = Math.max(MIN_SCORE, Math.min(MAX_SCORE, adjustedScore));
+                        
+                        double weightedScore = adjustedScore * criterion.getWeight();
+                        
+                        criterionScores.put(criterion.getName(), adjustedScore);
+                        totalWeightedScore += weightedScore;
+                        totalWeight += criterion.getWeight();
+                        
+                        log.debug("Criterion {} (missing metric {}): using default score={}, adjusted={}, weighted={}", 
+                                 criterion.getName(), criterionKey, defaultScore, adjustedScore, weightedScore);
+                    }
+                } catch (Exception e) {
+                    log.warn("Error processing criterion {} for technology {}: {}", 
+                            criterion.getName(), technology.getName(), e.getMessage());
+                    // Continue with next criterion
+                }
             }
+            
+            // Calculate overall score as weighted average
+            double overallScore = totalWeight > 0 ? totalWeightedScore / totalWeight : 50.0; // Default to neutral score
+            overallScore = Math.max(MIN_SCORE, Math.min(MAX_SCORE, overallScore));
+            
+            log.debug("Technology {} final score: {}", technology.getName(), overallScore);
+            
+            return new TechnologyScore(technology, overallScore, criterionScores);
+            
+        } catch (Exception e) {
+            log.error("Error calculating score for technology {}: {}", technology.getName(), e.getMessage());
+            // Return a minimal score to prevent complete failure
+            Map<String, Double> fallbackScores = new HashMap<>();
+            fallbackScores.put("Overall", 50.0);
+            return new TechnologyScore(technology, 50.0, fallbackScores);
         }
-        
-        // Calculate overall score as weighted average
-        double overallScore = totalWeight > 0 ? totalWeightedScore / totalWeight : 0.0;
-        overallScore = Math.max(MIN_SCORE, Math.min(MAX_SCORE, overallScore));
-        
-        log.debug("Technology {} final score: {}", technology.getName(), overallScore);
-        
-        return new TechnologyScore(technology, overallScore, criterionScores);
     }
     
     /**
